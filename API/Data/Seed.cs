@@ -10,13 +10,13 @@ public static class Seed
 {
     public static async Task SeedUsers(DataContext context)
     {
-        if(await context.Users.AnyAsync()) return;
+        //if(await context.Users.AnyAsync()) return;
 
         var userData = await File.ReadAllTextAsync("Data/UserSeedData.json");
 
         var users = JsonConvert.DeserializeObject<List<AppUser>>(userData);
 
-        foreach(var user in users)
+        foreach(var user in users.Where(u => !context.Users.Any(d => d.UserName == u.UserName)))
         {
             using var hmac = new HMACSHA512();
 

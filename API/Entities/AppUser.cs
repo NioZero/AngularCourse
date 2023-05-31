@@ -22,6 +22,8 @@ public class AppUser
 
     public string Gender { get; set; }
 
+    public string Introduction { get; set; }
+
     public string LookinFor { get; set; }
 
     public string Interests { get; set; }
