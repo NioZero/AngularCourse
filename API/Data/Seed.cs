@@ -1,7 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
 using API.Entities;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace API.Data;
