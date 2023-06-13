@@ -1,4 +1,3 @@
-using API.Data;
 using API.Extensions;
 using API.Middleware;
 
