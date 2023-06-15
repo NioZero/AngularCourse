@@ -34,5 +34,9 @@ public class AppUser
 
     public virtual ICollection<Photo> Photos { get; set; }
 
+    public virtual ICollection<UserLike> LikedByUsers { get; set; }
+
+    public virtual ICollection<UserLike> LikedUsers { get; set; }
+
     //public int GetAge() => DateOfBirth.CalculateAge();
 }
