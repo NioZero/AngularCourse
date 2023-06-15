@@ -38,5 +38,7 @@ public class AppUser
 
     public virtual ICollection<UserLike> LikedUsers { get; set; }
 
-    //public int GetAge() => DateOfBirth.CalculateAge();
+    public virtual ICollection<Message> MessagesSent { get; set; }
+
+    public virtual ICollection<Message> MessagesReceived { get; set; }
 }
