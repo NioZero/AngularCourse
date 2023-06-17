@@ -1,31 +1,70 @@
-using System.Security.Cryptography;
-using System.Text;
 using API.Entities;
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.Identity;
 
 namespace API.Data;
 
 public static class Seed
 {
-    public static async Task SeedUsers(DataContext context)
+    public static async Task SeedUsers(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
     {
         //if(await context.Users.AnyAsync()) return;
 
-        var userData = await File.ReadAllTextAsync("Data/UserSeedData.json");
+        // var userData = await File.ReadAllTextAsync("Data/UserSeedData.json");
 
-        var users = JsonConvert.DeserializeObject<List<AppUser>>(userData);
+        // var users = JsonConvert.DeserializeObject<List<AppUser>>(userData);
 
-        foreach(var user in users.Where(u => !context.Users.Any(d => d.UserName == u.UserName)))
+
+        var roles = new List<AppRole>()
         {
-            using var hmac = new HMACSHA512();
+            new AppRole { Name = "Member" },
+            new AppRole { Name = "Admin" },
+            new AppRole { Name = "Moderator" }
+        };
 
-            user.UserName = user.UserName.ToLower();
-            user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes("123456"));
-            user.PasswordSalt = hmac.Key;
-
-            context.Users.Add(user);
+        foreach(var role in roles)
+        {
+            await roleManager.CreateAsync(role);
         }
 
-        await context.SaveChangesAsync();
+        /*foreach(var user in userManager.Users.ToList())
+        {
+            Console.WriteLine($"Reset password for user '{user.UserName}'");
+
+            var result = await userManager.RemovePasswordAsync(user);
+
+            Console.WriteLine($"Reset password result: {result.Succeeded}");
+            foreach(var error in result.Errors)
+                Console.WriteLine($"{error.Code}: {error.Description}");
+
+            Console.WriteLine();
+        }*/
+
+        /*foreach(var user in userManager.Users.ToList())
+        {
+            //user.UserName = user.UserName.ToLower();
+
+            Console.WriteLine($"Set default password for user '{user.UserName}'");
+
+            await userManager.RemovePasswordAsync(user);
+
+            var result = await userManager.AddPasswordAsync(user, "123456");
+
+            Console.WriteLine($"Set password result: {result.Succeeded}");
+            foreach(var error in result.Errors)
+                Console.WriteLine($"{error.Code}: {error.Description}");
+
+            Console.WriteLine();
+        }*/
+
+        foreach(var user in userManager.Users.ToList())
+        {
+            await userManager.AddToRoleAsync(user, "Member");
+        }
+
+        var admin = userManager.Users.SingleOrDefault(u => u.UserName == "ghidalgo");
+        if(admin != null)
+        {
+            await userManager.AddToRolesAsync(admin, new[] { "Admin", "Moderator" });
+        }
     }
 }
