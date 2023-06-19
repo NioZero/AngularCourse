@@ -13,7 +13,8 @@ public static class ApplicationServiceExtensions
     {
         services.AddDbContext<DataContext>(opt =>
         {
-            opt.UseSqlServer(configuration.GetConnectionString("DatabaseConnection"));
+            //opt.UseSqlServer(configuration.GetConnectionString("DatabaseConnection"));
+            opt.UseNpgsql(configuration.GetConnectionString("DatabaseConnection"));
         });
         services.AddCors();
         services.AddScoped<ITokenService, TokenService>();

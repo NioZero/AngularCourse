@@ -15,6 +15,7 @@ builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 
 var app = builder.Build();
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionMiddleware>();
@@ -25,9 +26,12 @@ app.UseCors(builder => builder
     .WithOrigins("https://localhost:4200"));
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.MapControllers();
 app.MapHub<PresenceHub>("hubs/presence");
 app.MapHub<MessageHub>("hubs/message");
+app.MapFallbackToController("Index", "Fallback");
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
@@ -39,8 +43,8 @@ try
     var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
 
     await context.Database.MigrateAsync();
-    await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE [Connections]");
-    //await API.Data.Seed.SeedUsers(userManager, roleManager);
+    await API.Data.Seed.ClearConnections(context);
+    await API.Data.Seed.SeedUsers(userManager, roleManager);
 }
 catch(Exception ex)
 {
